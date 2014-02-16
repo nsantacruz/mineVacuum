@@ -1,0 +1,134 @@
+----------------------------------------------------
+solveForGrid(currGrid)
+----------------------------------------------------
+	parameter: 2d array where entries can be nums 1-8 or #
+	returns: double array. first item is a list of positions that minesweeper should click
+		second is a list of positions minesweeper should flag
+	summary: function looks for solution of all sq.s in currGrid. 
+		first it needs to set up connectivity diagram, by setting Square.adjacent property of all bs and us
+		then it makes equation matrix
+		then it looks for solutions, starting with simple ones and going to more complex
+		as it finds solutions, it puts them in the solutions double array
+		if no solutions are found, it uses probability to guess
+-------------------------------------------------------
+getBorderSquares(currGrid,w,h)
+-------------------------------------------------------
+	parameters: takes currGrid (see prev func) and dimensions of grid
+	returns: array of bs which are Square objects
+	summary: loops through grid and looks for nums with # next to it
+		if it finds this, num must be bs. convert the num to a Square obj
+		(see Square.py). It keeps track of its position, which is very useful later
+-------------------------------------------------------
+getBorderUnrevealedSquares(bsArray)
+--------------------------------------------------------
+	parameters: array of bs Square objects
+	returns: array of us Square objects
+	summary: uses output of getBorderSquares() to find all us. 
+		it basically loops through them, finds all adjacent Squares
+		and weeds out duplicates
+----------------------------------------------------------
+updateAdjacentBS(currGrid,borderSquares,w,h)
+---------------------------------------------------------
+	parameters: currGrid - (see solveForGrid())
+		borderSquares - array of bs Square objects
+		w,h - dimensions of currGrid
+	returns: (nothing)
+	summary: updates the Square.adjacent property of all bs by looking for 
+		all nums of value '#' in currGrid. when it finds these, it converts
+		them to Square objects and adds them to the current bs's adjacent list
+------------------------------------------------------------
+updateAdjacentUS(unrevealedSquares)*******NEEDS (a bit of ) WORK************************
+---------------------------------------------------------------
+	parameters: unrevealedSquares - array of us Square objects
+	returns: (nothing)
+	summary: this function doesn't actually make sense as of yet...
+	needs to reference same Square obj.s as were returned in getBorderSquares()...
+--------------------------------------------------------------
+getSurroundingPositions(x,y,w,h)
+--------------------------------------------------------------
+	parameters: x,y - position which you'd like to find surrounding positions for
+				w,h - dimensions of minesweeper grid
+	returns: array of valid positions around (x,y)
+	summary: for a given position (x,y) it returns a list of valid positions
+		i.e. positions that are in the bounds of the grid's dimensions w,h
+-----------------------------------------------------------------
+makeReallyCoolMatrix  **********************NEEDS (a bit of ) WORK*****************
+----------------------------------------------------------------
+	parameters: borderSquares - list of bs obtained from getBorderSquares()
+			w,h - dimensions of grid
+	returns: really cool matrix, a 2d array. first item is binary representing aus for any given bs
+										second item is number of given bs
+										third is a tuple of position of bs
+	summary: loop through borderSquares and use getEquation() to get any given bs's equation
+-------------------------------------------------------------------
+getEquation (hopefully it works...)
+--------------------------------------------------------------------
+	parameter: sq - a bs Square obj that you want to get equation for
+	returns: array (see prev func for details)
+	summary: make binary num. indexes on this bin will be numbered from the right, like a decimal where index number 1 is the 1's position
+		loop through Square.adjacent (made up of Square objects)
+		for each sq, translate its 2d position to 1d (simple multiplication)
+		this will be its index in the binary num. somehow set that index to '1' meaning "there's an unrevealed square here"
+		once done, add solution (ie Square.number) and position (ie Square.position)
+-------------------------------------------------------------------
+solveTrivialSolutions 
+--------------------------------------------------------------------
+	parameter: matrix
+	returns: solution array i.e. double array. first index is positions to click
+											second is positions to flag
+	summary: N/A
+--------------------------------------------------------------------
+getSubsets   
+---------------------------------------------------------------------
+	parameters: matrix
+	returns: double array, each inner array has indexes of subset pairs (could be more than 2?)
+	summary: N/A (in order to find larger subsets, probably loop through all subset pairs
+		that you just found and see if there are triple pairs. if no triple pairs, stop
+		if there are search for quad pairs etc. probably some type of while loop...)
+----------------------------------------------------------------------
+solveSubsets 
+-----------------------------------------------------------------------
+	parameter: subsets - obtained from getSubsets()
+	returns: solution array (see solveTrivialSolutions())
+	summary: N/A
+-----------------------------------------------------------------------
+getSimilarEquations ********************NEEDS WORK**************************
+------------------------------------------------------------------------
+	parameter: matrix
+	returns: solution array (see solveTrivialSolutions())
+	summary: gets eq.s with two or more spaces in common
+------------------------------------------------------------------------
+solveSimilarEquations ********************NEEDS WORK*********************
+--------------------------------------------------------------------------
+	parameter: simEqs - list of similar equations obtained from getSimilarEquations()
+	returns: solution array (see solveTrivialSolutions())
+	summary: N/A
+-------------------------------------------------------------------------
+getProb      *********************NEEDS (a bit of ) WORK ****************
+-------------------------------------------------------------------------
+	parameters: aus - specific aus that you want to know prob of finding a mine under
+				rcm - really cool (useless) matrix
+	returns: probability of hitting mine on aus
+	summary: NOTE: Doesn't take into account flagged squares and how they change number!
+		for any aus given, the probability is determined (hopefully this is right...)
+		by the probability of the abs who borders the least number of aus including this specific aus
+		this abs can be said to be the limiting factor for this aus, determining its probability
+--------------------------------------------------------------------------
+getBestProb *********************NEEDS (a bit of ) WORK ****************
+--------------------------------------------------------------------------
+	parameters: ausArray - array of aus obtained from getAdjacentUS()
+				rcm - really cool matrix
+	returns: solution array (see solveTrivialSolutions()) with only one value
+		either a position to click or position to flag
+	summary: loop through ausArray and use getProb(aus) to get prob for each
+		save lowest prob (i.e. leaset prob to hit a mine) and it's corresponding aus
+		now you need to compare it with prob that there's a mine anywhere else
+		this could get complicated: need a way of finding minimum amount of mines in aus...
+---------------------------------------------------------------------------
+addSolutions
+---------------------------------------------------------------------------
+	parameters: solArray - solution array (see solve TrivialSolutions()) to which you'd like to add a solution
+		(i.e. a position where you'd like to flag or click)
+				newSols - solution array which you'd like to append to solArray
+	returns: (nothing)
+	summary: simple, just adds two 2d arrays together

@@ -1,0 +1,82 @@
+ _______ _________ _        _______  _______           _______  _______  _______  _______  _______ 
+(       )\__   __/( (    /|(  ____ \(  ____ \|\     /|(  ____ \(  ____ \(  ____ )(  ____ \(  ____ )
+| () () |   ) (   |  \  ( || (    \/| (    \/| )   ( || (    \/| (    \/| (    )|| (    \/| (    )|
+| || || |   | |   |   \ | || (__    | (_____ | | _ | || (__    | (__    | (____)|| (__    | (____)|
+| |(_)| |   | |   | (\ \) ||  __)   (_____  )| |( )| ||  __)   |  __)   |  _____)|  __)   |     __)
+| |   | |   | |   | | \   || (            ) || || || || (      | (      | (      | (      | (\ (   
+| )   ( |___) (___| )  \  || (____/\/\____) || () () || (____/\| (____/\| )      | (____/\| ) \ \__
+|/     \|\_______/|/    )_)(_______/\_______)(_______)(_______/(_______/|/       (_______/|/   \__/
+(ascii art credit of: http://patorjk.com/software/taag/#p=display&f=Graffiti&t=Type%20Something%20)
+
+
+****NOTE******
+Finding subset equations really needs to be refined.
+There should be a way of doing it with just the matrix...
+*****************
+Here's what we've got so far.
+add or comment as you see fit. 
+a lot of this is just guessing and should be refined. 
+So far, it's really just a neater way of putting what we've already talked about
+-----------------LEGEND----------------------------------------
+sq  =  square                             = a unit in the minesweeper board
+bs  =  border square                      = any number next to an unrevealed square
+us  =  unrevealed square                  = any square that is unknown, especially if it is adjacent to a bs
+a*  =  (i.e. abs or aus) adjacent + *     = refers to any us that are adjacent to a bs or vice versa
+ezs =  effectively zero square            = square that's equation equals zero after row operations
+cd  =  connectivity diagram               = really complicated way of showing relationship between tiles (to be renamed as Eli sees fit)
+aa  =  adjacent array                     = array of adjacent sqs of interest (could be either array of aus or abs, depending on if the array is a property of a bs or us respectively
+-------------------------------------------------------------------
+7 Steps the Program goes through each turn:
+
+1) 	SORT---------------------------------------------------------------------------------------------------------
+	sort through newly revealed sq.s (this could be either first turn or any subsequent turn)
+	this means, weeding out zero sq or ezs . we now have a list of the sq.s the program will be looping through (for this turn)
+	::ENote:: No need to use up another loop to weed out zeros. just say "if square == 0, continue;" in a later loop.
+
+2) 	CONNECTIONS------------------------------------------------------------------------------------------------------
+	update aa.s of all bs and us. 
+	this gives us a cd (or whatever you want to call it) which we can easily use to find abs and aus by passing from one to the other
+3) 	MATRIX-------------------------------------------------------------------------------------------------------------
+	make really cool and huge matrix using the cd or rather aas of all bs and us.
+	to make the matrix, we should make a 2d array of all squares involved in matrix.
+	an extra equation should be added containing all square's variables. this is the master equation
+	each Square object should have a property (it doesn't yet) called "x" (or something like that).
+	this represents its value in the matrix. by default it is set to "None" (maybe we could think of something more useful...)
+	then, when we find out the value of a variable, set it by saying "square.x = 0" or "square.x = 1"
+
+	::ENote:: Sorry I didn't put it in here (See email), but we can represent each "equation" as a binary number of 1s and 0s, and
+		  just & them together to find subsets.
+			e.g. from Minesweeper.pdf:
+				a. 110000 1
+				b. 111110 2
+				c. 000111 1
+				d. 000011 1
+
+			a & b = a   ====>  b - a = 2 - 1 ===> 001110 = 1
+			b & c != b or c ====> continue
+			c & d = d   ====> c - d = 1 - 1 ===> 000100 = 0
+	
+	::NNote:: That's genius! makes it much simpler. we still need a way of linking an equation to its corresponding square so that we can figure out what we've solved for. 
+		how do we use binary to also solve for trivial solutions (ie 2 unknowns = 2 therefore both are mines)
+		
+	
+4) 	TRIVIAL SOLUTIONS-----------------------------------------------------------------------------------------------------------
+	examine each equation in matrix and look for trivial solutions (yes, I know the term is used incorrectly but it sounds cool)
+		a)if an equation's number of unknowns equals its corresponding solution, they're all mines, so flag them
+		a flag effectively sets that variable to 1. you don't necessarily need to flag, but it is used in the MineSweeper to class to avoid erronious clicks. 
+		b) if an equation equals zero, that square's aus are not mines, so reveal them
+		
+
+5)	SUBSETS----------------------------------------------------------------------------------------------------------------------------
+	now the fun part. if there are no easy solutions, find subsets:
+		a) do bitwise & operations on eq.s for abs (which are hopefully consecutive eq.s in matrix) 
+if you get only 
+6)	PROBABILITY-------------------------------------------------------------------------------------------------------------------------
+	if there are no subsets, use probability:
+	hopefully you've been able to reduce the matrix a bit, so you can use some info there.
+	(blah, too tired to finish.....................)
+
+	::ENote:: Let's once again take our pdf matrix, the last one: … and do it tomorrow… I think that it might involve xoring or noting or oring, so we'll see.
+
+
+7)  seven is a cool number!		
